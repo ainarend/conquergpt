@@ -2,7 +2,7 @@
   <ion-page>
     <ion-header :translucent="true">
       <ion-toolbar>
-        <ion-title>ConquerGPT</ion-title>
+        <ion-title>ConquerGPT - rules</ion-title>
       </ion-toolbar>
     </ion-header>
 
@@ -35,9 +35,9 @@
             </ion-toolbar>
           </ion-header>
           <ion-content class="ion-padding">
-            <ul>
-              <li v-for="(item, i) in log" :key="i">{{ item }}</li>
-            </ul>
+            <SpeechBubble v-for="(item, i) in log" :key="i" :color="item.color" :user-name="item.user">
+              {{ item.message }}
+            </SpeechBubble>
           </ion-content>
         </ion-menu>
       </ion-split-pane>
@@ -49,13 +49,18 @@
 import { GoogleMap, Marker } from "vue3-google-map";
 import { IonContent, IonHeader, IonPage, IonTitle, IonToolbar, IonLoading } from '@ionic/vue';
 import {ref, watch} from "vue";
+import SpeechBubble from "@/components/SpeechBubble.vue";
 
 const loading = ref(true);
 const mapRef = ref(null);
-const log = ref(['Welcome, setting up game']);
+const log = ref([{user: 'Moderator', message: 'Welcome, setting up the game', color: 'orange'}]);
 
 watch(() => mapRef.value?.ready, async (ready) => {
   if (!ready) return;
+
+  await delay(1500);
+
+  pushToLog('Moderator', `Okay, we are good to go. Click on the map to choose your country,`);
 
   loading.value = false;
 
@@ -64,8 +69,8 @@ watch(() => mapRef.value?.ready, async (ready) => {
   const map = ref.map;
   const api = ref.api;
 
-  const myColor = 'green';
-  const opponentColor = 'red';
+  const myColor = '#0b702b';
+  const opponentColor = '#e00140';
   const countryPlaceMap: any = {};
   const placeIdToColorMap: any = {};
 
@@ -77,9 +82,11 @@ watch(() => mapRef.value?.ready, async (ready) => {
 
   const myChoice = 'Estonia';
   countryPlaceMap[myChoice] = {};
-  countryPlaceMap[myChoice].placeId = await findBoundary(myChoice);
+  const myCountryInfo = await findBoundary(myChoice);
+  countryPlaceMap[myChoice].placeId = myCountryInfo.placeId;
   countryPlaceMap[myChoice].color = myColor;
-  pushToLog(`You chose: ${myChoice}`);
+  map.setCenter(myCountryInfo.location);
+  pushToLog('You',`I choose ${myChoice}`);
 
   Object.keys(countryPlaceMap).forEach(countryName => {
     const country = countryPlaceMap[countryName];
@@ -88,16 +95,18 @@ watch(() => mapRef.value?.ready, async (ready) => {
 
   styleBoundary();
   await delay(1300);
-  pushToLog(`Asking ChatGPT to choose`);
-  await delay(3000);
+  pushToLog('Moderator', `Asking ChatGPT to choos a country to play with`);
+
+  await delay(800);
   loading.value = true;
-  const opponentChoice = 'Lithuania';
+  const opponentChoice = await getAnswerFromChatGPT('country');
   await delay(3000);
   loading.value = false;
-  pushToLog(`ChatGPT chose: ${opponentChoice}`);
+  pushToLog('ChatGPT', `I choose ${opponentChoice}`);
 
   countryPlaceMap[opponentChoice] = {};
-  countryPlaceMap[opponentChoice].placeId = await findBoundary(opponentChoice);
+  const {placeId} = await findBoundary(opponentChoice);
+  countryPlaceMap[opponentChoice].placeId = placeId;
   countryPlaceMap[opponentChoice].color = opponentColor;
 
   Object.keys(countryPlaceMap).forEach(countryName => {
@@ -107,7 +116,7 @@ watch(() => mapRef.value?.ready, async (ready) => {
 
   styleBoundary();
 
-  async function findBoundary(country) {
+  async function findBoundary(country): Promise<any> {
     const request = {
       query: country,
       fields: ['id', 'location'],
@@ -118,7 +127,7 @@ watch(() => mapRef.value?.ready, async (ready) => {
 
     if (places.length) {
       const place = places[0];
-      return place.id;
+      return {placeId: place.id, location: place.location};
     } else {
       console.log('No results');
       return false;
@@ -146,11 +155,20 @@ watch(() => mapRef.value?.ready, async (ready) => {
     };
   }
 
-  function pushToLog(message) {
-    log.value.push(message);
+  function pushToLog(user, message) {
+    let color = 'orange';
+    if (user === 'You') color = 'green';
+    else if (user === 'ChatGPT') color = 'red';
+    log.value.push({user, message, color});
   }
   async function delay(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
+  async function getAnswerFromChatGPT(answerAbout) {
+    const response = await fetch(`http://localhost:3000/chatgpt/${answerAbout}`);
+    const data = await response.text();
+    return data;
   }
 });
 
