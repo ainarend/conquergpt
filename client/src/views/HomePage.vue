@@ -35,9 +35,13 @@
             </ion-toolbar>
           </ion-header>
           <ion-content class="ion-padding">
-            <SpeechBubble v-for="(item, i) in log" :key="i" :color="item.color" :user-name="item.user">
-              {{ item.message }}
-            </SpeechBubble>
+            <SpeechBubble
+                v-for="(item, i) in log"
+                :key="i"
+                :color="item.color"
+                :user-name="item.user"
+                :message="item.message"
+            />
           </ion-content>
         </ion-menu>
       </ion-split-pane>
@@ -58,7 +62,7 @@ const log = ref([{user: 'Moderator', message: 'Welcome, setting up the game', co
 watch(() => mapRef.value?.ready, async (ready) => {
   if (!ready) return;
 
-  await delay(1500);
+  await delay(3000);
 
   pushToLog('Moderator', `Okay, we are good to go. Click on the map to choose your country,`);
 
@@ -78,7 +82,7 @@ watch(() => mapRef.value?.ready, async (ready) => {
 
   const {Place} = await google.maps.importLibrary("places");
 
-  await delay(3000);
+  await delay(5500);
 
   const myChoice = 'Estonia';
   countryPlaceMap[myChoice] = {};
@@ -94,15 +98,16 @@ watch(() => mapRef.value?.ready, async (ready) => {
   })
 
   styleBoundary();
-  await delay(1300);
+  await delay(2000);
   pushToLog('Moderator', `Asking ChatGPT to choos a country to play with`);
 
-  await delay(800);
+  await delay(3000);
   loading.value = true;
   const opponentChoice = await getAnswerFromChatGPT('country');
   await delay(3000);
   loading.value = false;
   pushToLog('ChatGPT', `I choose ${opponentChoice}`);
+  await delay(1500);
 
   countryPlaceMap[opponentChoice] = {};
   const {placeId} = await findBoundary(opponentChoice);
