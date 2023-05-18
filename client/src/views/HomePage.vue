@@ -73,6 +73,23 @@ watch(() => mapRef.value?.ready, async (ready) => {
   const map = ref.map;
   const api = ref.api;
 
+  map.addListener("click", async (mapsMouseEvent) => {
+    const geocoder = new api.Geocoder;
+
+    const data =  await geocoder.geocode({location: mapsMouseEvent.latLng});
+
+    const result = data.results && data.results[0];
+    if (result) {
+      const addresses = result.address_components;
+      const address = addresses.find((address) => address.types.includes('country'));
+
+      const country = address.long_name || false;
+
+      console.log('country', country)
+      alert(country);
+    }
+  });
+
   const myColor = '#0b702b';
   const opponentColor = '#e00140';
   const countryPlaceMap: any = {};
