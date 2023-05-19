@@ -21,6 +21,8 @@
                 :fullscreen-control="false"
                 :map-type-control="false"
                 :street-view-control="false"
+                :clickable-icons="false"
+                :styles="mapStyles"
                 version="beta"
                 ref="mapRef"
             >
@@ -84,6 +86,16 @@ const toggleAnimation = ($e) => {
 
 const center = { lat: 58.2, lng: 25.044502 };
 const zoom = 4;
+const mapStyles = [
+  {
+    "featureType": "poi",
+    "stylers": [
+      {
+        "visibility": "off"
+      }
+    ]
+  }
+];
 </script>
 
 <style scoped>
