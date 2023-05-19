@@ -19,7 +19,7 @@ export class ChatgptService {
     async makeRequestToGPT(prompt: string): Promise<string> {
         const res = await this.api.sendMessage(prompt)
         console.log(res.text)
-        return res.text;
+        return res.text.replace('.', '');
     }
 
 }

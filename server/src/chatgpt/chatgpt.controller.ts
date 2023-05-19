@@ -7,7 +7,7 @@ export class ChatgptController {
     constructor(private readonly chatgptService: ChatgptService) {};
 
     @Get('/country')
-    async getCountryChoice(@Query('userCountry') userCountry): Promise<string> {
-       return await this.chatgptService.makeRequestToGPT(`Choose a random European country close to, but not neighbouring ${userCountry}?`);
+    async getCountryChoice(@Query('playerCountry') playerCountry): Promise<string> {
+       return await this.chatgptService.makeRequestToGPT(`Choose a random European country close to, but not a neighbour of ${playerCountry}??`);
     }
 }

@@ -1,13 +1,23 @@
 <template>
-  <div class="speechbubble" :class="`speechbubble--${color}`">
+    <div class="speechbubble" :style="`border-color: ${color}`" :class="`speechbubble--${userName}`">
     <p :id="randomId"></p>
     <span class="username">{{ userName }}</span>
   </div>
 </template>
 
 <script>
+import {useGameStore} from "@/store/game";
+
 export default {
   props: {
+    animate: {
+      type: Boolean,
+      required: true
+    },
+    index: {
+      type: Number,
+      required: true,
+    },
     color: {
       type: String,
       required: true
@@ -26,9 +36,13 @@ export default {
       return this.userName + (Math.random() * 10000)
     }
   },
+  setup() {
+    const gameStore = useGameStore();
+    return { gameStore };
+  },
   data() {
     return {
-      index: 0
+      textIndex: 0
     }
   },
   mounted() {
@@ -38,13 +52,20 @@ export default {
     type() {
       const typewriter = document.getElementById(this.randomId);
       const text = this.message;
-      if (this.index < text.length) {
-        typewriter.innerHTML = text.slice(0, this.index) + '<span class="blinking-cursor">|</span>';
-        this.index++;
+      if (!this.animate) {
+        typewriter.innerHTML = text;
+        this.gameStore.setMessageAnimated(this.index);
+        this.$emit('finished');
+        return;
+      }
+      if (this.textIndex < text.length) {
+        typewriter.innerHTML = text.slice(0, this.textIndex) + '<span class="blinking-cursor">|</span>';
+        this.textIndex++;
         setTimeout(this.type, Math.random() * 50 + 50);
       } else {
-        typewriter.innerHTML = text.slice(0, this.index) + '<span class="blinking-cursor">|</span>';
+        typewriter.innerHTML = text.slice(0, this.textIndex) + '<span class="blinking-cursor">|</span>';
         this.$emit('finished');
+        this.gameStore.setMessageAnimated(this.index);
       }
     }
   }
@@ -55,9 +76,6 @@ export default {
 $color1 :     #161719;
 $color2 :     #26272b;
 $text :       #9fa2a7;
-$highlight1 : #0b702b;
-$highlight2 : #e00140;
-$highlight3 : #ff8750;
 
 .speechbubble {
   background-color: $color2;
@@ -67,22 +85,12 @@ $highlight3 : #ff8750;
   padding: 15px 25px;
   margin-bottom: 10px;
   cursor: default;
-  &--green,
-  &--red, {
+  &--player,
+  &--chatGPT, {
     border-right: 5px solid;
   }
-
-  &--green {
-    border-color: $highlight1;
-  }
-
-  &--red {
-    border-color: $highlight2;
-  }
-
-  &--orange {
+  &--moderator {
     border-left: 5px solid;
-    border-color: $highlight3;
   }
 
   .username {
