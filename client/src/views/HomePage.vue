@@ -26,6 +26,7 @@
                 version="beta"
                 ref="mapRef"
             >
+              <Army :position="center" />
             </GoogleMap>
           </div>
         </div>
@@ -61,6 +62,7 @@ import {ref, watch} from "vue";
 import SpeechBubble from "@/components/SpeechBubble.vue";
 import {useGameStore} from "@/store/game";
 import {storeToRefs} from "pinia";
+import Army from "@/components/Army.vue";
 
 const mapRef = ref(null);
 const animateText = ref(true);
@@ -84,6 +86,7 @@ const toggleAnimation = ($e) => {
   animateText.value = $e.detail.checked;
 };
 
+// @todo: get the defaults from the store.
 const center = { lat: 58.2, lng: 25.044502 };
 const zoom = 4;
 const mapStyles = [

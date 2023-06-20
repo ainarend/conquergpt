@@ -12,6 +12,7 @@ export const useMapStore = defineStore('map', {
         featureLayer: null,
         countryPlaceMap: {} as any,
         placeIdToColorMap: {} as any,
+        zoomLevel: 4,
     }),
     actions: {
         async init(payload: {map: any, api: any}) {
@@ -36,6 +37,9 @@ export const useMapStore = defineStore('map', {
 
                     await gameStore.clickedOnCountry(country);
                 }
+            });
+            this.map.addListener('zoom_changed', () => {
+                this.zoomLevel = this.map.getZoom();
             });
 
             this.featureLayer = this.map.getFeatureLayer('COUNTRY')
@@ -71,6 +75,9 @@ export const useMapStore = defineStore('map', {
                 location = this.countryPlaceMap[countryNameOrLocation].location;
             }
             this.map.setCenter(location);
+        },
+        drawArmies() {
+            // todo
         },
         async findBoundary(country: string): Promise<any> {
           const request = {
