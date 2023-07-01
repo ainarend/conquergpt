@@ -33,7 +33,11 @@ export const useMapStore = defineStore('map', {
                     const addresses = result.address_components;
                     const address = addresses.find((address: any) => address.types.includes('country'));
 
-                    const country = address.long_name || false;
+                    const country = address?.long_name || false;
+
+                    if (!country) {
+                        return;
+                    }
 
                     await gameStore.clickedOnCountry(country);
                 }

@@ -47,7 +47,12 @@
               version="beta"
               ref="mapRef"
           >
-            <Army :position="center" />
+            <Army
+                v-for="(army, key) in armies"
+                :key="`${key}${army.component}`"
+                :component="army.component"
+                :position="army.position"
+            />
           </GoogleMap>
         </div>
       </div>
@@ -58,16 +63,24 @@
 <script setup lang="ts">
 import {GoogleMap} from "vue3-google-map";
 import {IonContent, IonHeader, IonLoading, IonPage, IonTitle, IonToolbar, IonToggle, IonMenuToggle, IonMenu} from '@ionic/vue';
-import {onMounted, ref, watch} from "vue";
+import {computed, onMounted, ref, watch} from "vue";
 import SpeechBubble from "@/components/SpeechBubble.vue";
 import {useGameStore} from "@/store/game";
 import {storeToRefs} from "pinia";
 import Army from "@/components/Army.vue";
+import {useMapStore} from "@/store/map";
+import {usePlayerStore} from "@/store/player";
+import {usePlayerChatGPTStore} from "@/store/playerChatGPT";
+import {Country} from "@/types/country";
 
 const mapRef = ref(null);
 const animateText = ref(true);
 
 const gameStore = useGameStore();
+const mapStore = useMapStore();
+const playerStore = usePlayerStore();
+const playerChatGPTStore = usePlayerChatGPTStore();
+
 const log = gameStore.messages;
 const loading = storeToRefs(gameStore).isLoading;
 
@@ -87,6 +100,25 @@ watch(() => mapRef.value?.ready, async (ready) => {
     },
   });
 });
+
+
+const armies = computed(() => {
+  const armies: any[] = [];
+  const pushArmies = (country: Country) => {
+    if (!mapStore.countryPlaceMap[country.name]) {
+      return;
+    }
+    armies.push(
+        {
+          position: mapStore.countryPlaceMap[country.name].location,
+          component: country.army,
+        }
+    );
+  };
+  playerStore.countries.forEach(pushArmies);
+  playerChatGPTStore.countries.forEach(pushArmies);
+  return armies;
+})
 
 const toggleAnimation = ($e) => {
   animateText.value = $e.detail.checked;

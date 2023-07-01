@@ -25,8 +25,6 @@ import '@ionic/vue/css/display.css';
 import './theme/variables.css';
 
 export const CONSTANTS = Object.freeze({
-  DEFAULT_NUMBER_OF_ARMIES: 5,
-  ARMIES_PER_TURN: 3,
 });
 
 const pinia = createPinia();

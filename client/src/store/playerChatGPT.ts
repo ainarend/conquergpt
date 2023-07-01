@@ -13,12 +13,15 @@ export const usePlayerChatGPTStore = defineStore('playerChatGPT', {
     }),
     actions: {
         async chooseBaseCountry() {
+            const gameStore = useGameStore();
             const playerStore = usePlayerStore();
+
             const playerCountry = playerStore.countries.find(country => country.isBaseCountry).name;
+
             const countryName = await this.getAnswerFromChatGPT(`country?playerCountry=${playerCountry}`);
             const country: Country = {
                 name: countryName,
-                armies: CONSTANTS.DEFAULT_NUMBER_OF_ARMIES,
+                army: gameStore.chooseRandomArmyComponent(),
                 isBaseCountry: true,
             };
             this.baseCountry = country;
@@ -27,7 +30,6 @@ export const usePlayerChatGPTStore = defineStore('playerChatGPT', {
             const mapStore = useMapStore();
             await mapStore.updateMapAfterCountryChoice({country: countryName, color: PlayerColors.chatGPT});
 
-            const gameStore = useGameStore();
             await gameStore.startGame();
         },
         async addCountry(country: Country) {

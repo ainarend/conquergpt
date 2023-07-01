@@ -12,9 +12,10 @@ export const usePlayerStore = defineStore('player', {
     }),
     actions: {
         async chooseBaseCountry(countryName: string) {
+            const gameStore = useGameStore();
             const country: Country = {
                 name: countryName,
-                armies: CONSTANTS.DEFAULT_NUMBER_OF_ARMIES,
+                army: gameStore.chooseRandomArmyComponent(),
                 isBaseCountry: true,
             };
             this.baseCountry = country;
@@ -23,13 +24,13 @@ export const usePlayerStore = defineStore('player', {
             const mapStore = useMapStore();
             await mapStore.updateMapAfterCountryChoice({country: countryName, color: PlayerColors.player});
 
-            const gameStore = useGameStore();
             await gameStore.playerHasChosenBaseCountry();
         },
         async clickedOnCountry(countryName: string) {
+            const gameStore = useGameStore();
             const country: Country = {
                 name: countryName,
-                armies: CONSTANTS.DEFAULT_NUMBER_OF_ARMIES,
+                army: gameStore.chooseRandomArmyComponent(),
                 isBaseCountry: false,
             };
             await this.addCountry(country);

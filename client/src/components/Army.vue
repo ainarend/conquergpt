@@ -1,6 +1,6 @@
 <template>
   <CustomMarker :options="{ position, anchorPoint: 'BOTTOM_CENTER' }">
-    <component :style='`width: ${markerSize}px; height: ${markerSize}px`' :is="armyComponentToShow" />
+    <component :style='`width: ${markerSize}px; height: ${markerSize}px`' :is="component" />
   </CustomMarker>
 </template>
 
@@ -27,6 +27,10 @@ export default {
       type: Object,
       required: true,
     },
+    component: {
+      type: String,
+      required: true,
+    }
   },
   computed: {
     ...mapState(useMapStore, {
@@ -35,10 +39,6 @@ export default {
     markerSize() {
       // return (60 / this.zoomLevel) * 10;
       return 50;
-    },
-    armyComponentToShow() {
-      const components = ['Army1', 'Army2', 'Army3', 'Army4', 'Army5'];
-      return components[Math.floor(Math.random() * components.length)]
     },
   },
 }

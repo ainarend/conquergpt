@@ -2,7 +2,7 @@ import {defineStore} from "pinia";
 import {usePlayerStore} from "@/store/player";
 import {useMapStore} from "@/store/map";
 import {usePlayerChatGPTStore} from "@/store/playerChatGPT";
-import {CONSTANTS} from "@/main";
+import {Army} from "@/types/country";
 
 export enum GameStatuses {
     'initializing' = 'initializing',
@@ -155,10 +155,15 @@ export const useGameStore = defineStore('game', {
                 userName: this.turn,
                 color: PlayerColors[this.turn],
                 message:
-                    `Okay, player, now it's your turn for turn ${this.turnNumber}. Plus ${CONSTANTS.ARMIES_PER_TURN} new armies. What is your next move?`,
+                    `Okay, player, now it's your turn for turn ${this.turnNumber}. What is your next move?`,
             });
 
             this.setTurn(WhoseTurn.player);
+        },
+        chooseRandomArmyComponent() {
+            const armies = Object.values(Army);
+            const index = Math.floor(Math.random() * armies.length);
+            return armies[index];
         }
     },
 })
