@@ -133,12 +133,13 @@ export const useGameStore = defineStore('game', {
                 color: PlayerColors[this.turn],
                 message: `Great, asking ChatGPT to choose it's Base country...`,
             });
+            this.setStatus(GameStatuses.choosingCountries);
             this.setTurn(WhoseTurn.chatGPT);
             await this.delay(400);
             await this.playerChatGpt.chooseBaseCountry();
-            this.setStatus(GameStatuses.choosingCountries);
         },
         async startGame() {
+            this.setStatus(GameStatuses.playing);
             this.setTurn(WhoseTurn.moderator);
             await this.addMessage({
                 userName: this.turn,
@@ -159,6 +160,7 @@ export const useGameStore = defineStore('game', {
             });
 
             this.setTurn(WhoseTurn.player);
+            this.setStatus(GameStatuses.playing);
         },
         chooseRandomArmyComponent() {
             const armies = Object.values(Army);

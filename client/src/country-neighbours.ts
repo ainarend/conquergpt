@@ -2,7 +2,7 @@
 // then clean up neighbours with regex search: "\[.*\]", use select all references and delete them all at once.
 // also search & delete "".
 
-export const isNeighbour = (country1, country2) => {
+export const areCountriesNeighbours = (country1: string, country2: string): boolean => {
     return countryNeighbours[country1].includes(country2);
 }
 

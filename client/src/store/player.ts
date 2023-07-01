@@ -3,6 +3,8 @@ import {Country} from "@/types/country";
 import {useMapStore} from "@/store/map";
 import {GameStatuses, PlayerColors, useGameStore, WhoseTurn} from "@/store/game";
 import {CONSTANTS} from "@/main";
+import {areCountriesNeighbours} from "@/country-neighbours";
+import {alertController} from "@ionic/vue";
 
 
 export const usePlayerStore = defineStore('player', {
@@ -27,12 +29,26 @@ export const usePlayerStore = defineStore('player', {
             await gameStore.playerHasChosenBaseCountry();
         },
         async clickedOnCountry(countryName: string) {
+            const isNeighbour = this.countries.some(c => areCountriesNeighbours(c.name, countryName));
+
+            if (!isNeighbour) {
+                const alert = await alertController.create({
+                    header: 'Alert',
+                    subHeader: 'Wait, wait, wait',
+                    message: `${countryName} is not a neighbour of any of your countries. Please choose a neighbour country.`,
+                    buttons: ['Choose again'],
+                });
+
+                await alert.present();
+                return false;
+            }
             const gameStore = useGameStore();
             const country: Country = {
                 name: countryName,
                 army: gameStore.chooseRandomArmyComponent(),
                 isBaseCountry: false,
             };
+
             await this.addCountry(country);
 
             const mapStore = useMapStore();
@@ -46,7 +62,6 @@ export const usePlayerStore = defineStore('player', {
                 message: `I choose ${country.name} as my country.`,
                 finishedAnimating: false,
             })
-            gameStore.setStatus(GameStatuses.choosingCountries);
             this.countries.push(country);
         }
     }
