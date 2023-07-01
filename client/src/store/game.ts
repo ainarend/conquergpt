@@ -138,6 +138,19 @@ export const useGameStore = defineStore('game', {
             await this.delay(400);
             await this.playerChatGpt.chooseBaseCountry();
         },
+        async playerHasChosenACountry() {
+            await this.delay(1000);
+            this.setTurn(WhoseTurn.moderator);
+            await this.addMessage({
+                userName: this.turn,
+                color: PlayerColors[this.turn],
+                message: `Great, asking ChatGPT to make it's move...`,
+            });
+            this.setStatus(GameStatuses.playing);
+            this.setTurn(WhoseTurn.chatGPT);
+            await this.delay(400);
+            await this.playerChatGpt.chooseNextCountry();
+        },
         async startGame() {
             this.setStatus(GameStatuses.playing);
             this.setTurn(WhoseTurn.moderator);

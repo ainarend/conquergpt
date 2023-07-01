@@ -53,6 +53,8 @@ export const usePlayerStore = defineStore('player', {
 
             const mapStore = useMapStore();
             await mapStore.updateMapAfterCountryChoice({country: countryName, color: PlayerColors.player});
+
+            await gameStore.playerHasChosenACountry();
         },
         async addCountry(country: Country) {
             const gameStore = useGameStore();

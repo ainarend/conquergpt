@@ -32,6 +32,26 @@ export const usePlayerChatGPTStore = defineStore('playerChatGPT', {
 
             await gameStore.startGame();
         },
+        async chooseNextCountry() {
+            const gameStore = useGameStore();
+            const playerStore = usePlayerStore();
+
+            const countries = this.countries.map(country => country.name).join(',');
+
+            const countryName = await this.getAnswerFromChatGPT(`next-country?countries=${countries}`);
+            const country: Country = {
+                name: countryName,
+                army: gameStore.chooseRandomArmyComponent(),
+                isBaseCountry: true,
+            };
+            this.baseCountry = country;
+            await this.addCountry(country);
+
+            const mapStore = useMapStore();
+            await mapStore.updateMapAfterCountryChoice({country: countryName, color: PlayerColors.chatGPT});
+
+            await gameStore.startGame();
+        },
         async addCountry(country: Country) {
             const gameStore = useGameStore();
             await gameStore.addMessage({
