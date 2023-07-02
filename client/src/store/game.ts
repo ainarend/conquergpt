@@ -2,13 +2,17 @@ import {defineStore} from "pinia";
 import {usePlayerStore} from "@/store/player";
 import {useMapStore} from "@/store/map";
 import {usePlayerChatGPTStore} from "@/store/playerChatGPT";
-import {Army} from "@/types/country";
+import {Army, Country} from "@/types/country";
+import {BattleResult, useBattleStore} from "@/store/battle";
 
 export enum GameStatuses {
     'initializing' = 'initializing',
     'choosingCountries' = 'choosingCountries',
     'updatingLog' = 'updatingLog',
     'playing' = 'playing',
+    'batteling' = 'batteling',
+    'gameWon' = 'gameWon',
+    'gameLost' = 'gameLost',
 }
 
 export enum WhoseTurn {
@@ -175,10 +179,33 @@ export const useGameStore = defineStore('game', {
             this.setTurn(WhoseTurn.player);
             this.setStatus(GameStatuses.playing);
         },
-        chooseRandomArmyComponent() {
+        chooseRandomArmyComponent(): string {
             const armies = Object.values(Army);
             const index = Math.floor(Math.random() * armies.length);
             return armies[index];
+        },
+        willNeedToBattleForCountry(countryName: string): boolean {
+            const whoseTurn = this.turn;
+            const checkIfPlayerCountry = (playerCountry: Country) => playerCountry.name === countryName;
+            if (whoseTurn === WhoseTurn.player) {
+                const chatGPTCountries = this.playerChatGpt.countries;
+                if (chatGPTCountries.find(checkIfPlayerCountry)) {
+                    return true;
+                }
+            } else {
+                const playerCountries = this.playerMe.countries;
+                if (playerCountries.find(checkIfPlayerCountry)) {
+                    return true;
+                }
+            }
+            return false;
+        },
+        async battleForCountry(countryName: string): Promise<BattleResult> {
+            const battleStore = useBattleStore();
+            if (this.turn === WhoseTurn.player) {
+                return await battleStore.letsBattle(this.playerMe, this.playerChatGpt, countryName);
+            }
+            return await battleStore.letsBattle(this.playerChatGpt, this.playerMe, countryName);
         }
     },
 })

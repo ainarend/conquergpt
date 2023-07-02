@@ -5,6 +5,7 @@ import {GameStatuses, PlayerColors, useGameStore, WhoseTurn} from "@/store/game"
 import {CONSTANTS} from "@/main";
 import {areCountriesNeighbours} from "@/country-neighbours";
 import {alertController} from "@ionic/vue";
+import {BattleResult} from "@/store/battle";
 
 
 export const usePlayerStore = defineStore('player', {
@@ -42,7 +43,15 @@ export const usePlayerStore = defineStore('player', {
                 await alert.present();
                 return false;
             }
+
             const gameStore = useGameStore();
+
+            if (gameStore.willNeedToBattleForCountry(countryName)) {
+                if ((await gameStore.battleForCountry(countryName)) === BattleResult.lost){
+                    return;
+                }
+            }
+
             const country: Country = {
                 name: countryName,
                 army: gameStore.chooseRandomArmyComponent(),
