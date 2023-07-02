@@ -179,28 +179,35 @@ export const useGameStore = defineStore('game', {
             this.setTurn(WhoseTurn.player);
             this.setStatus(GameStatuses.playing);
         },
-        chooseRandomArmyComponent(): string {
+        chooseRandomArmyComponent(): Army {
             const armies = Object.values(Army);
             const index = Math.floor(Math.random() * armies.length);
             return armies[index];
         },
         willNeedToBattleForCountry(countryName: string): boolean {
+            console.log('willNeedToBattleForCountry')
             const whoseTurn = this.turn;
             const checkIfPlayerCountry = (playerCountry: Country) => playerCountry.name === countryName;
             if (whoseTurn === WhoseTurn.player) {
+                console.log('willNeedToBattleForCountry players turn')
                 const chatGPTCountries = this.playerChatGpt.countries;
                 if (chatGPTCountries.find(checkIfPlayerCountry)) {
+                    console.log('willNeedToBattleForCountry player ', true)
                     return true;
                 }
             } else {
+                console.log('willNeedToBattleForCountry gpt turn')
                 const playerCountries = this.playerMe.countries;
                 if (playerCountries.find(checkIfPlayerCountry)) {
+                    console.log('willNeedToBattleForCountry gpt ', true)
                     return true;
                 }
             }
+            console.log('willNeedToBattleForCountry  ', false)
             return false;
         },
         async battleForCountry(countryName: string): Promise<BattleResult> {
+            console.log('battleForCountry ')
             const battleStore = useBattleStore();
             if (this.turn === WhoseTurn.player) {
                 return await battleStore.letsBattle(this.playerMe, this.playerChatGpt, countryName);

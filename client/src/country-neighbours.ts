@@ -5,8 +5,7 @@
 export const areCountriesNeighbours = (country1: string, country2: string): boolean => {
     return countryNeighbours[country1].includes(country2);
 }
-
-const countryNeighbours = {
+const countryNeighbours: any = {
     "Abkhazia": [
         "Georgia",
         "Russia",

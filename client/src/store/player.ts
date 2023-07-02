@@ -1,8 +1,7 @@
 import {defineStore} from "pinia";
 import {Country} from "@/types/country";
 import {useMapStore} from "@/store/map";
-import {GameStatuses, PlayerColors, useGameStore, WhoseTurn} from "@/store/game";
-import {CONSTANTS} from "@/main";
+import {PlayerColors, useGameStore, WhoseTurn} from "@/store/game";
 import {areCountriesNeighbours} from "@/country-neighbours";
 import {alertController} from "@ionic/vue";
 import {BattleResult} from "@/store/battle";

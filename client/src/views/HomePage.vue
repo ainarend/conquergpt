@@ -72,7 +72,6 @@ import {useMapStore} from "@/store/map";
 import {usePlayerStore} from "@/store/player";
 import {usePlayerChatGPTStore} from "@/store/playerChatGPT";
 import {Country} from "@/types/country";
-import {areCountriesNeighbours} from "@/country-neighbours";
 
 const mapRef = ref(null);
 const animateText = ref(false);

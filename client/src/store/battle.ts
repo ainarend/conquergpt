@@ -1,5 +1,4 @@
 import {defineStore} from "pinia";
-import {useGameStore} from "@/store/game";
 import {usePlayerStore} from "@/store/player";
 import {usePlayerChatGPTStore} from "@/store/playerChatGPT";
 import {Country} from "@/types/country";
@@ -22,6 +21,7 @@ export const useBattleStore = defineStore('battle', {
             defender: ReturnType<typeof usePlayerStore> | ReturnType<typeof usePlayerChatGPTStore> | null,
             battlingForCountry: Country["name"],
         ): Promise<BattleResult> {
+            console.log('battle for country', battlingForCountry);
             this.setupBattle(aggressor, defender, battlingForCountry);
 
             return BattleResult.lost;

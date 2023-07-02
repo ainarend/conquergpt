@@ -20,6 +20,7 @@ export const useMapStore = defineStore('map', {
             this.api = payload.api;
 
             this.map.addListener("click", async (mapsMouseEvent: any) => {
+                console.log('clicked on map');
                 const gameStore = useGameStore();
                 if (gameStore.isLoading) {
                     return;

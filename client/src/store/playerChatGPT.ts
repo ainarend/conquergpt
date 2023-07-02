@@ -2,9 +2,8 @@ import {defineStore} from "pinia";
 import {Country} from "@/types/country";
 import {useMapStore} from "@/store/map";
 import {PlayerColors, useGameStore, WhoseTurn} from "@/store/game";
-import {CONSTANTS} from "@/main";
 import {usePlayerStore} from "@/store/player";
-
+import {BattleResult} from "@/store/battle";
 
 export const usePlayerChatGPTStore = defineStore('playerChatGPT', {
     state: () => ({
@@ -34,17 +33,22 @@ export const usePlayerChatGPTStore = defineStore('playerChatGPT', {
         },
         async chooseNextCountry() {
             const gameStore = useGameStore();
-            const playerStore = usePlayerStore();
 
             const countries = this.countries.map(country => country.name).join(',');
 
             const countryName = await this.getAnswerFromChatGPT(`next-country?countries=${countries}`);
+
+            if (gameStore.willNeedToBattleForCountry(countryName)) {
+                if ((await gameStore.battleForCountry(countryName)) === BattleResult.lost){
+                    return;
+                }
+            }
+
             const country: Country = {
                 name: countryName,
                 army: gameStore.chooseRandomArmyComponent(),
                 isBaseCountry: true,
             };
-            this.baseCountry = country;
             await this.addCountry(country);
 
             const mapStore = useMapStore();
