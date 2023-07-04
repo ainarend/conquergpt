@@ -45,7 +45,8 @@ export const usePlayerChatGPTStore = defineStore('playerChatGPT', {
             const { reasoning } = json;
 
             if (gameStore.willNeedToBattleForCountry(countryName)) {
-                if ((await gameStore.battleForCountry(countryName)) === BattleResult.lost){
+                if ((await gameStore.battleForCountry(countryName)) === BattleResult.lost) {
+                    console.log('lost battle');
                     return;
                 }
             }

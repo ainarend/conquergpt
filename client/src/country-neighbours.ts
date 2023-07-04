@@ -5,6 +5,11 @@
 export const areCountriesNeighbours = (country1: string, country2: string): boolean => {
     return countryNeighbours[country1].includes(country2);
 }
+
+export const findFirstNeighbour = (country: string, countries: string[]): string => {
+    return countries.find((c: string) => areCountriesNeighbours(country, c));
+}
+
 const countryNeighbours: any = {
     "Abkhazia": [
         "Georgia",

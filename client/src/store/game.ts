@@ -5,6 +5,7 @@ import {usePlayerChatGPTStore} from "@/store/playerChatGPT";
 import {Army, Country} from "@/types/country";
 import {BattleResult, useBattleStore} from "@/store/battle";
 import {randomNumberFromARande} from "@/utils";
+import {findFirstNeighbour} from "@/country-neighbours";
 
 export enum GameStatuses {
     'initializing' = 'initializing',
@@ -84,6 +85,7 @@ export const useGameStore = defineStore('game', {
                 'The spotlight is on you, ',
             ];
             const message = randomMessages[randomNumberFromARande(0, randomMessages.length - 1)];
+            const mapStore = useMapStore();
             if (this.turn === WhoseTurn.player) {
                 this.setTurn(WhoseTurn.chatGPT);
                 await this.addMessage(
@@ -94,6 +96,7 @@ export const useGameStore = defineStore('game', {
                     }
                 );
                 this.setStatus(GameStatuses.playing);
+                mapStore.moveMapToCountry(this.playerChatGpt.baseCountry.name);
                 return;
             }
             this.turnNumber++;
@@ -106,6 +109,7 @@ export const useGameStore = defineStore('game', {
                 }
             );
             this.setStatus(GameStatuses.playing);
+            mapStore.moveMapToCountry(this.playerMe.baseCountry.name);
         },
         addMessage(message: GameMessage) {
             if (!Object.hasOwn( message, 'finishedAnimating')) {
@@ -199,7 +203,7 @@ export const useGameStore = defineStore('game', {
             await this.addMessage({
                 userName: this.turn,
                 color: PlayerColors[this.turn],
-                message: `Okay, lets start the game!`,
+                message: `Awesome, lets start the game!`,
             });
 
             this.turnNumber++;
@@ -223,34 +227,37 @@ export const useGameStore = defineStore('game', {
             return armies[index];
         },
         willNeedToBattleForCountry(countryName: string): boolean {
-            console.log('willNeedToBattleForCountry')
             const whoseTurn = this.turn;
             const checkIfPlayerCountry = (playerCountry: Country) => playerCountry.name === countryName;
+
             if (whoseTurn === WhoseTurn.player) {
-                console.log('willNeedToBattleForCountry players turn')
                 const chatGPTCountries = this.playerChatGpt.countries;
+
                 if (chatGPTCountries.find(checkIfPlayerCountry)) {
-                    console.log('willNeedToBattleForCountry player ', true)
                     return true;
                 }
             } else {
-                console.log('willNeedToBattleForCountry gpt turn')
                 const playerCountries = this.playerMe.countries;
                 if (playerCountries.find(checkIfPlayerCountry)) {
-                    console.log('willNeedToBattleForCountry gpt ', true)
                     return true;
                 }
             }
-            console.log('willNeedToBattleForCountry  ', false)
             return false;
         },
         async battleForCountry(countryName: string): Promise<BattleResult> {
-            console.log('battleForCountry ')
             const battleStore = useBattleStore();
             if (this.turn === WhoseTurn.player) {
-                return await battleStore.letsBattle(this.playerMe, this.playerChatGpt, countryName);
+                const closestAttackNeighbour = findFirstNeighbour(countryName, this.playerMe.countries.map(c => c.name));
+                const attackingFromCountry = this.playerMe.countries.find(c => c.name === closestAttackNeighbour);
+                const battlingForCountry = this.playerChatGpt.countries.find(c => c.name === countryName);
+
+                return await battleStore.letsBattle(this.playerMe, this.playerChatGpt, battlingForCountry, attackingFromCountry);
             }
-            return await battleStore.letsBattle(this.playerChatGpt, this.playerMe, countryName);
+            const closestAttackNeighbour = findFirstNeighbour(countryName, this.playerChatGpt.countries.map(c => c.name));
+            const attackingFromCountry = this.playerChatGpt.countries.find(c => c.name === closestAttackNeighbour);
+            const battlingForCountry = this.playerMe.countries.find(c => c.name === countryName);
+
+            return await battleStore.letsBattle(this.playerChatGpt, this.playerMe, battlingForCountry, attackingFromCountry);
         }
     },
 })

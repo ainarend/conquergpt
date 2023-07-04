@@ -6,40 +6,38 @@
 import {
   modalController,
 } from '@ionic/vue';
-import { onMounted,} from "vue";
-import DiceBox from "@3d-dice/dice-box";;
+import {onMounted, watch,} from "vue";
+import {useBattleStore} from "@/store/battle";
+import StartBattleModal from "@/components/StartBattleModal.vue";
+import {storeToRefs} from "pinia";
 
-onMounted(()=> {
-  const Box = new DiceBox("#dice-box", {
-    assetPath: "/assets/",
-    theme: "default",
-    offscreen: true,
-    scale: 6
-  });
+const battleStore = useBattleStore();
+const isOnGoingBattle = storeToRefs(battleStore).isOnGoing;
 
-  Box.init().then(async () => {
-    Box.roll([{
-      sides: 6,
-      themeColor: "#679b68",
-      qty: 2,
-    },{
-      sides: 6,
-      themeColor: "#ff0000",
-      qty: 1,
-    }]);
-    Box.onRollComplete = (results) => {
-      console.log(results);
-    }
-  });
+onMounted(async () => {
+  battleStore.setReadyToRollDice();
 });
 
+watch(isOnGoingBattle, async (isOnGoingBattle) => {
+  if (isOnGoingBattle) {
+    const modal = await modalController.create({
+      component: StartBattleModal,
+      componentProps: {
+        attacker: battleStore.attacker,
+        defender: battleStore.defender,
+        countryUnderAttack: battleStore.battlingForCountry,
+      },
+      keyboardClose: false,
+    });
 
-const cancel = () => {
-  modalController.dismiss('asdasd', 'cancel');
-}
-const confirm = () => {
-  modalController.dismiss('asd', 'confirm');
-}
+    modal.present();
+    const { data, role } = await modal.onWillDismiss();
+
+    if (role === 'confirm') {
+      battleStore.rollDice();
+    }
+  }
+});
 </script>
 
 <style>

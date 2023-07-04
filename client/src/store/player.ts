@@ -47,6 +47,7 @@ export const usePlayerStore = defineStore('player', {
 
             if (gameStore.willNeedToBattleForCountry(countryName)) {
                 if ((await gameStore.battleForCountry(countryName)) === BattleResult.lost){
+                    console.log('lost battle');
                     return;
                 }
             }

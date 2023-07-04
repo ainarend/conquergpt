@@ -31,8 +31,8 @@
           </div>
         </div>
         <div class="content">
-          <RollDice v-if="showDiceRoll" />
-          <ion-router-outlet style="position: relative" v-else />
+          <RollDice v-show="showDiceRoll" />
+          <ion-router-outlet style="position: relative" />
         </div>
       </div>
     </ion-page>
@@ -49,7 +49,7 @@ import {computed, ref} from "vue";
 import {GameStatuses, useGameStore} from "@/store/game";
 import GameRules from "@/components/GameRules.vue";
 
-const animateText = ref(true);
+const animateText = ref(false);
 const toggleAnimation = ($e) => {
   animateText.value = $e.detail.checked;
 };
