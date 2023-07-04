@@ -77,10 +77,18 @@ export const useBattleStore = defineStore('battle', {
                 }
             ]);
 
-            Box.onRollComplete = (results) => {
-                // @todo: add result checking.
-                console.log(results);
-                this.resultPromise(BattleResult.lost);
+            Box.onRollComplete = (results) => {''
+                const attackerRolls = results[0].rolls;
+                const attackerResult =
+                    attackerRolls[0].value > attackerRolls[1].value
+                        ? attackerRolls[0].value
+                        : attackerRolls[1].value;
+
+                const defenderRolls = results[1].rolls;
+                const defenderResult = defenderRolls[0].value;
+
+                this.resultPromise(attackerResult > defenderResult ? BattleResult.won : BattleResult.lost);
+
                 this.initBattle(null, null, null, null);
             }
         },
