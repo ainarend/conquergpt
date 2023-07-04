@@ -75,7 +75,7 @@ export default {
 <style scoped lang="scss">
 $color1 :     #161719;
 $color2 :     #26272b;
-$text :       #9fa2a7;
+$text : #ffffff;
 
 .speechbubble {
   background-color: $color2;
