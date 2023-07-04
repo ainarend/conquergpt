@@ -12,7 +12,7 @@ export class ChatgptService {
         const { ChatGPTAPI } = await importDynamic('chatgpt');
         this.api = new ChatGPTAPI({
             apiKey: process.env.OPENAI_API_KEY,
-            systemMessage: 'You are a player in a board game. Answer as short as possible, using only one word if possible.',
+            systemMessage: 'You are a player in a board game.',
         });
     }
 

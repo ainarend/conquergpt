@@ -5,7 +5,7 @@ import {PlayerColors, useGameStore, WhoseTurn} from "@/store/game";
 import {areCountriesNeighbours} from "@/country-neighbours";
 import {alertController} from "@ionic/vue";
 import {BattleResult} from "@/store/battle";
-
+import {randomNumberFromARande} from "@/utils";
 
 export const usePlayerStore = defineStore('player', {
     state: () => ({
@@ -65,11 +65,25 @@ export const usePlayerStore = defineStore('player', {
             await gameStore.playerHasChosenACountry();
         },
         async addCountry(country: Country) {
+            const messages = [
+                'I selected',
+                'I chose',
+                'I picked',
+                'I opted for',
+                'I decided on',
+                'I made my choice for',
+                'I went with',
+                'I settled on',
+                'I elected to choose',
+                'I determined to choose',
+                'I singled out',
+            ];
+            const message = messages[randomNumberFromARande(0, messages.length - 1)];
             const gameStore = useGameStore();
             await gameStore.addMessage({
                 userName: WhoseTurn.player,
                 color: PlayerColors[WhoseTurn.player],
-                message: `I choose ${country.name} as my country.`,
+                message: `${message} ${country.name} as my country.`,
                 finishedAnimating: false,
             })
             this.countries.push(country);

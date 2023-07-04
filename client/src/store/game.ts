@@ -4,6 +4,7 @@ import {useMapStore} from "@/store/map";
 import {usePlayerChatGPTStore} from "@/store/playerChatGPT";
 import {Army, Country} from "@/types/country";
 import {BattleResult, useBattleStore} from "@/store/battle";
+import {randomNumberFromARande} from "@/utils";
 
 export enum GameStatuses {
     'initializing' = 'initializing',
@@ -62,12 +63,49 @@ export const useGameStore = defineStore('game', {
         setTurn(turn: WhoseTurn) {
             this.turn = turn;
         },
-        changeTurnBetweenPlayers() {
+        async changeTurnBetweenPlayers() {
+            const randomMessages = [
+                'Your turn, ',
+                'Make some magic, ',
+                'What will you do now, ',
+                'Whoa, what now, ',
+                'Lets make some moves, ',
+                'Great! Now its your turn, ',
+                'Any ideas whats next, ',
+                'Your move, ',
+                'Take your turn, ',
+                'Proceed, ',
+                'It is your go, ',
+                'Your round, ',
+                'Play, ',
+                'Go ahead, ',
+                'Your action, ',
+                'Time to play, ',
+                'The spotlight is on you, ',
+            ];
+            const message = randomMessages[randomNumberFromARande(0, randomMessages.length - 1)];
             if (this.turn === WhoseTurn.player) {
-                return this.setTurn(WhoseTurn.chatGPT);
+                this.setTurn(WhoseTurn.chatGPT);
+                await this.addMessage(
+                    {
+                        userName: WhoseTurn.moderator,
+                        color: PlayerColors[WhoseTurn.moderator] as string,
+                        message: message + 'chatGPT',
+                    }
+                );
+                this.setStatus(GameStatuses.playing);
+                return;
             }
             this.turnNumber++;
             this.setTurn(WhoseTurn.player);
+            await this.addMessage(
+                {
+                    userName: WhoseTurn.moderator,
+                    color: PlayerColors[WhoseTurn.moderator] as string,
+                    message: message + 'player',
+                }
+            );
+            this.setStatus(GameStatuses.playing);
         },
         addMessage(message: GameMessage) {
             if (!Object.hasOwn( message, 'finishedAnimating')) {
@@ -181,7 +219,7 @@ export const useGameStore = defineStore('game', {
         },
         chooseRandomArmyComponent(): Army {
             const armies = Object.values(Army);
-            const index = Math.floor(Math.random() * armies.length);
+            const index = randomNumberFromARande(0, armies.length - 1);
             return armies[index];
         },
         willNeedToBattleForCountry(countryName: string): boolean {
