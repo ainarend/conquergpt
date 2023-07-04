@@ -1,19 +1,21 @@
 <template>
   <ion-app>
     <ion-page>
-      <ion-header :translucent="true">
+      <ion-header style="position: absolute; z-index: 10000">
         <ion-toolbar>
-          <ion-title>ConquerGPT - rules</ion-title>
-          <button @click="showChat=!showChat">{{ chatIsShown ? 'Hide chat' : 'Show chat'}}</button>
+          <ion-buttons slot="start">
+            <ion-menu-button @click="showChat=!showChat" :auto-hide="false"></ion-menu-button>
+          </ion-buttons>
+          <ion-title>ConquerGPT | <span style="cursor: pointer" @click="setOpen(true)">Game Rules</span></ion-title>
+          <ion-modal :is-open="rulesModalOpen">
+            <GameRules @update:rulesModalOpen="setOpen" />
+          </ion-modal>
         </ion-toolbar>
       </ion-header>
       <div class="page-layout" :class="{'no-chat': !chatIsShown}">
         <div class="chat" v-show="chatIsShown">
           <span class="scroll-start-at-top"></span>
           <div>
-            <ion-toggle style="margin-bottom: 0.25rem" :checked="animateText" @ionChange="toggleAnimation">
-              Show text animation
-            </ion-toggle>
             <SpeechBubble
                 v-for="(item, i) in log"
                 :key="i"
@@ -23,6 +25,9 @@
                 :message="item.message"
                 :animate="!log.finishedAnimating && animateText"
             />
+            <ion-toggle style="margin-top: 0.5rem" :checked="animateText" @ionChange="toggleAnimation">
+              Show text animation
+            </ion-toggle>
           </div>
         </div>
         <div class="content">
@@ -35,13 +40,14 @@
 </template>
 
 <script setup lang="ts">
-import {IonApp, IonHeader, IonPage, IonRouterOutlet, IonTitle, IonToggle, IonToolbar} from '@ionic/vue';
+import {IonApp, IonHeader, IonPage, IonRouterOutlet, IonTitle, IonToggle, IonToolbar, IonButtons, IonModal} from '@ionic/vue';
 import RollDice from "@/components/RollDice.vue";
 import {storeToRefs} from "pinia";
 import {useBattleStore} from "@/store/battle";
 import SpeechBubble from "@/components/SpeechBubble.vue";
 import {computed, ref} from "vue";
 import {GameStatuses, useGameStore} from "@/store/game";
+import GameRules from "@/components/GameRules.vue";
 
 const animateText = ref(true);
 const toggleAnimation = ($e) => {
@@ -61,7 +67,7 @@ const chatIsShown = computed(() => {
     }
     return false;
   }
-  return true;
+  return showChat.value;
 })
 
 const gameStore = useGameStore();
@@ -70,12 +76,19 @@ const battleStore = useBattleStore();
 const showDiceRoll = storeToRefs(battleStore).isOnGoing;
 
 const log = gameStore.messages;
+
+const rulesModalOpen = ref(false);
+const setOpen = (isOpen: boolean) => {
+  rulesModalOpen.value = isOpen;
+}
 </script>
 <style scoped lang="scss">
+$header-height: 56px;
 .page-layout {
   display: grid;
   grid-template-columns: 300px auto;
-  height: 100%;
+  height: calc(100% - $header-height);
+  margin-top: $header-height;
   width: 100%;
   .chat {
     background-color: #000;

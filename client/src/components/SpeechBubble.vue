@@ -64,6 +64,8 @@ export default {
         setTimeout(this.type, Math.random() * 50 + 50);
       } else {
         typewriter.innerHTML = text.slice(0, this.textIndex) + '<span class="blinking-cursor">|</span>';
+        const cursor = typewriter.querySelector('.blinking-cursor');
+        cursor.remove();
         this.$emit('finished');
         this.gameStore.setMessageAnimated(this.index);
       }
