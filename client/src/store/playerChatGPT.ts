@@ -1,7 +1,7 @@
 import {defineStore} from "pinia";
 import {Country} from "@/types/country";
 import {useMapStore} from "@/store/map";
-import {PlayerColors, useGameStore, WhoseTurn} from "@/store/game";
+import {GameStatuses, PlayerColors, useGameStore, WhoseTurn} from "@/store/game";
 import {usePlayerStore} from "@/store/player";
 import {BattleResult} from "@/store/battle";
 
@@ -42,13 +42,40 @@ export const usePlayerChatGPTStore = defineStore('playerChatGPT', {
             const json = await this.getAnswerFromChatGPT(`next-country?countries=${countries}`);
 
             const countryName = json.country;
-            const { reasoning } = json;
+            let { reasoning } = json;
 
             if (gameStore.willNeedToBattleForCountry(countryName)) {
-                if ((await gameStore.battleForCountry(countryName)) === BattleResult.lost) {
+                const playerStore = usePlayerStore();
+
+                const playerCountriesLeft = playerStore.countries.length;
+                const confirmBattleJson = await this.getAnswerFromChatGPT(`confirm-battle?country=${countryName}&countriesLeft=${playerCountriesLeft}`);
+
+                if (!confirmBattleJson.confirm) {
+                    await gameStore.addMessage({
+                        userName: WhoseTurn.chatGPT,
+                        color: PlayerColors[WhoseTurn.chatGPT],
+                        message: confirmBattleJson.reasoning,
+                    })
+                    return await this.chooseNextCountry();
+                }
+
+                await gameStore.addMessage({
+                    userName: WhoseTurn.chatGPT,
+                    color: PlayerColors[WhoseTurn.chatGPT],
+                    message: confirmBattleJson.reasoning,
+                });
+                gameStore.setStatus(GameStatuses.playing);
+                const battle = await gameStore.battleForCountry(countryName);
+
+                const {comment} = await this.getAnswerFromChatGPT(`comment-on-battle?country=${countryName}&battleResult=${battle.result}&attackReasoning=${encodeURI(confirmBattleJson.reasoning)}`);
+
+
+                if (battle.result === BattleResult.lost){
                     console.log('lost battle');
+                    await gameStore.battleLost(battle, comment);
                     return;
                 }
+                reasoning = comment;
             }
 
             const country: Country = {

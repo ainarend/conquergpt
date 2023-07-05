@@ -10,6 +10,17 @@ export enum BattleResult {
     'lost' = 'lost',
 }
 
+export interface Battle {
+    forCountry: Country["name"],
+    result: BattleResult,
+    diceResults: {
+        attacker: number,
+        defender: number,
+    },
+}
+
+let Box;
+
 export const useBattleStore = defineStore('battle', {
     state: () => ({
         isOnGoing: false,
@@ -20,7 +31,7 @@ export const useBattleStore = defineStore('battle', {
         defender: null as WhoseTurn.player | WhoseTurn.chatGPT | null,
         battlingForCountry: null as Country | null,
         attackingFromCountry: null as Country | null,
-        resultPromise: null as Promise<BattleResult> | null
+        resultPromise: null as Promise<Battle> | null,
     }),
     actions: {
         async letsBattle(
@@ -28,7 +39,7 @@ export const useBattleStore = defineStore('battle', {
             defender: ReturnType<typeof usePlayerStore> | ReturnType<typeof usePlayerChatGPTStore> | null,
             battlingForCountry: Country,
             attackingFromCountry: Country,
-        ): Promise<BattleResult> {
+        ): Promise<Battle> {
             console.log('battle for country', battlingForCountry);
             this.initBattle(aggressor, defender, battlingForCountry, attackingFromCountry);
 
@@ -57,14 +68,16 @@ export const useBattleStore = defineStore('battle', {
                 return;
             }
 
-            const Box = new DiceBox("#dice-box", {
-                assetPath: "/assets/",
-                theme: "default",
-                offscreen: true,
-                scale: 6
-            });
+            if (!Box) {
+                Box = new DiceBox("#dice-box", {
+                    assetPath: "/assets/",
+                    theme: "default",
+                    offscreen: true,
+                    scale: 6
+                });
 
-            await Box.init();
+                await Box.init();
+            }
             Box.roll([
                 {
                     sides: 6,
@@ -87,12 +100,22 @@ export const useBattleStore = defineStore('battle', {
                 const defenderRolls = results[1].rolls;
                 const defenderResult = defenderRolls[0].value;
 
-                this.resultPromise(attackerResult > defenderResult ? BattleResult.won : BattleResult.lost);
+                const battle: Battle = {
+                    forCountry: this.battlingForCountry.name,
+                    result: attackerResult > defenderResult ? BattleResult.won : BattleResult.lost,
+                    diceResults: {
+                        attacker: attackerResult,
+                        defender: defenderResult,
+                    }
+                };
+
+                this.resultPromise(battle);
 
                 this.initBattle(null, null, null, null);
+                Box.clear();
             }
         },
-        getDiceRollResult(): Promise<BattleResult> {
+        getDiceRollResult(): Promise<Battle> {
             return new Promise((resolve) => {
                 this.resultPromise = resolve;
             });

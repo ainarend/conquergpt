@@ -3,7 +3,7 @@ import {usePlayerStore} from "@/store/player";
 import {useMapStore} from "@/store/map";
 import {usePlayerChatGPTStore} from "@/store/playerChatGPT";
 import {Army, Country} from "@/types/country";
-import {BattleResult, useBattleStore} from "@/store/battle";
+import {Battle, useBattleStore} from "@/store/battle";
 import {randomNumberFromARande} from "@/utils";
 import {findFirstNeighbour} from "@/country-neighbours";
 
@@ -12,7 +12,6 @@ export enum GameStatuses {
     'choosingCountries' = 'choosingCountries',
     'updatingLog' = 'updatingLog',
     'playing' = 'playing',
-    'batteling' = 'batteling',
     'gameWon' = 'gameWon',
     'gameLost' = 'gameLost',
 }
@@ -244,7 +243,7 @@ export const useGameStore = defineStore('game', {
             }
             return false;
         },
-        async battleForCountry(countryName: string): Promise<BattleResult> {
+        async battleForCountry(countryName: string): Promise<Battle> {
             const battleStore = useBattleStore();
             if (this.turn === WhoseTurn.player) {
                 const closestAttackNeighbour = findFirstNeighbour(countryName, this.playerMe.countries.map(c => c.name));
@@ -258,6 +257,30 @@ export const useGameStore = defineStore('game', {
             const battlingForCountry = this.playerMe.countries.find(c => c.name === countryName);
 
             return await battleStore.letsBattle(this.playerChatGpt, this.playerMe, battlingForCountry, attackingFromCountry);
+        },
+        async battleLost(battle: Battle, gptComment: string) {
+            let message = '';
+            if (this.turn === WhoseTurn.player) {
+                message = `Well-well, GPT rolled ${battle.diceResults.defender} and you rolled ${battle.diceResults.attacker}. You lost the battle for ${battle.forCountry}.`;
+
+            } else {
+                message = `So, player rolled ${battle.diceResults.defender} and GPT rolled ${battle.diceResults.attacker}. GPT lost the battle for ${battle.forCountry}.`;
+
+            }
+            await this.addMessage({
+                userName: WhoseTurn.moderator,
+                color: PlayerColors[WhoseTurn.moderator],
+                message,
+            });
+            await this.addMessage({
+                userName: WhoseTurn.chatGPT,
+                color: PlayerColors[WhoseTurn.chatGPT],
+                message: gptComment,
+            });
+            await this.changeTurnBetweenPlayers();
+            if (this.turn === WhoseTurn.chatGPT) {
+                await this.playerChatGpt.chooseNextCountry();
+            }
         }
     },
 })

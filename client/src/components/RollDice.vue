@@ -42,7 +42,10 @@ watch(isOnGoingBattle, async (isOnGoingBattle) => {
 
 <style>
 #dice-box {
-  position: relative;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 10000;
   box-sizing: border-box;
   width: 100%;
   height: 100%;

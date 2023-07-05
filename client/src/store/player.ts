@@ -1,7 +1,7 @@
 import {defineStore} from "pinia";
 import {Country} from "@/types/country";
 import {useMapStore} from "@/store/map";
-import {PlayerColors, useGameStore, WhoseTurn} from "@/store/game";
+import {GameStatuses, PlayerColors, useGameStore, WhoseTurn} from "@/store/game";
 import {areCountriesNeighbours} from "@/country-neighbours";
 import {alertController} from "@ionic/vue";
 import {BattleResult} from "@/store/battle";
@@ -46,8 +46,16 @@ export const usePlayerStore = defineStore('player', {
             const gameStore = useGameStore();
 
             if (gameStore.willNeedToBattleForCountry(countryName)) {
-                if ((await gameStore.battleForCountry(countryName)) === BattleResult.lost){
+                await gameStore.addMessage({
+                    userName: WhoseTurn.player,
+                    color: PlayerColors[WhoseTurn.player],
+                    message: `Time to claim ${countryName} as my country, let's battle GPT!`,
+                });
+                gameStore.setStatus(GameStatuses.playing);
+                const battle = await gameStore.battleForCountry(countryName);
+                if (battle.result === BattleResult.lost){
                     console.log('lost battle');
+                    await gameStore.battleLost(battle);
                     return;
                 }
             }

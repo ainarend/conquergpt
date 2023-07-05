@@ -103,7 +103,7 @@ $header-height: 56px;
     }
   }
   .content {
-
+    position: relative;
   }
 }
 .no-chat {
