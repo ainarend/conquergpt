@@ -6,6 +6,7 @@ import {areCountriesNeighbours} from "@/country-neighbours";
 import {alertController} from "@ionic/vue";
 import {BattleResult} from "@/store/battle";
 import {randomNumberFromARande} from "@/utils";
+import {usePlayerChatGPTStore} from "@/store/playerChatGPT";
 
 export const usePlayerStore = defineStore('player', {
     state: () => ({
@@ -52,11 +53,37 @@ export const usePlayerStore = defineStore('player', {
                     message: `Time to claim ${countryName} as my country, let's battle GPT!`,
                 });
                 gameStore.setStatus(GameStatuses.playing);
+
                 const battle = await gameStore.battleForCountry(countryName);
+
+                const playerGptStore = usePlayerChatGPTStore();
+                const battleResultForGpt = battle.result === BattleResult.won ? BattleResult.lost : BattleResult.won;
+                const {comment} = await playerGptStore.getAnswerFromChatGPT(
+                    `comment-on-battle?country=${countryName}&battleResult=${battleResultForGpt}&attackReasoning=${encodeURI('Player attacked you')}`
+                );
+
                 if (battle.result === BattleResult.lost){
                     console.log('lost battle');
-                    await gameStore.battleLost(battle);
+                    await gameStore.battleLost(battle, comment);
                     return;
+                }
+
+                // Moderator telling about winning the battle.
+                await gameStore.addMessage({
+                    userName: WhoseTurn.moderator,
+                    color: PlayerColors[WhoseTurn.moderator],
+                    message: `So, player rolled ${battle.diceResults.attacker} and GPT rolled ${battle.diceResults.defender}. You won the battle for ${battle.forCountry}.`,
+                });
+                // Add GPT comment on the loss of the country.
+                await gameStore.addMessage({
+                    userName: WhoseTurn.chatGPT,
+                    color: PlayerColors[WhoseTurn.chatGPT],
+                    message: comment,
+                });
+
+                playerGptStore.removeCountry(battle.forCountry);
+                if (playerGptStore.countries.length === 0) {
+                    return gameStore.setGameOver();
                 }
             }
 
@@ -96,6 +123,9 @@ export const usePlayerStore = defineStore('player', {
                 finishedAnimating: false,
             })
             this.countries.push(country);
-        }
+        },
+        removeCountry(countryName: string) {
+            this.countries = this.countries.filter(c => c.name !== countryName);
+        },
     }
 })

@@ -34,12 +34,16 @@ export const usePlayerChatGPTStore = defineStore('playerChatGPT', {
 
             await gameStore.startGame();
         },
-        async chooseNextCountry() {
+        async chooseNextCountry(): Promise<void> {
             const gameStore = useGameStore();
+            const playerStore = usePlayerStore();
 
             const countries = this.countries.map(country => country.name).join(',');
+            const opponentCountries = playerStore.countries.map(country => country.name).join(',');
 
-            const json = await this.getAnswerFromChatGPT(`next-country?countries=${countries}`);
+            const json = await this.getAnswerFromChatGPT(
+                `next-country?countries=${countries}&opponentCountries=${opponentCountries}`
+            );
 
             const countryName = json.country;
             let { reasoning } = json;
@@ -69,13 +73,22 @@ export const usePlayerChatGPTStore = defineStore('playerChatGPT', {
 
                 const {comment} = await this.getAnswerFromChatGPT(`comment-on-battle?country=${countryName}&battleResult=${battle.result}&attackReasoning=${encodeURI(confirmBattleJson.reasoning)}`);
 
-
                 if (battle.result === BattleResult.lost){
                     console.log('lost battle');
                     await gameStore.battleLost(battle, comment);
                     return;
                 }
+
+                // Moderator telling about winning the battle.
+                await gameStore.addMessage({
+                    userName: WhoseTurn.moderator,
+                    color: PlayerColors[WhoseTurn.moderator],
+                    message: `So, player rolled ${battle.diceResults.defender} and GPT rolled ${battle.diceResults.attacker}. GPT won the battle for ${battle.forCountry}.`,
+                });
+                // Show the victory comment instead of why to conquer the country.
                 reasoning = comment;
+
+                playerStore.removeCountry(battle.forCountry);
             }
 
             const country: Country = {
@@ -100,10 +113,13 @@ export const usePlayerChatGPTStore = defineStore('playerChatGPT', {
             })
             this.countries.push(country);
         },
+        removeCountry(countryName: string) {
+            this.countries = this.countries.filter(c => c.name !== countryName);
+        },
         async getAnswerFromChatGPT(answerAbout: string) {
             const response = await fetch(`http://localhost:3000/chatgpt/${answerAbout}`);
             const json = await response.json();
             return json;
-        }
+        },
     }
 })

@@ -12,14 +12,18 @@ export class ChatgptService {
         const { ChatGPTAPI } = await importDynamic('chatgpt');
         this.api = new ChatGPTAPI({
             apiKey: process.env.OPENAI_API_KEY,
-            systemMessage: 'You are a player in a board game.',
+            systemMessage: 'You are a player in a board game. Your goal is to conquer the countries of your opponent.',
         });
     }
 
     async makeRequestToGPT(prompt: string): Promise<string> {
-        const res = await this.api.sendMessage(prompt)
-        console.log(res.text)
-        return res.text.replace('.', '');
+        try {
+            const res = await this.api.sendMessage(prompt)
+            this.logger.log(res.text)
+            return res.text.replace('.', '');
+        } catch (error) {
+            this.logger.error(`Request to GPT error: ${error}`);
+        }
     }
 
 }

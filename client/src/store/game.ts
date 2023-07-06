@@ -52,10 +52,20 @@ export const useGameStore = defineStore('game', {
         isLoading(): boolean {
             return [GameStatuses.initializing, GameStatuses.updatingLog].includes(this.status);
         },
+        isGameWon(): boolean {
+            return this.status === GameStatuses.gameWon;
+        },
+        isGameLost(): boolean {
+            return this.status === GameStatuses.gameLost;
+        },
     },
     actions: {
         async delay(ms: number) {
             // return new Promise(resolve => setTimeout(resolve, ms));
+        },
+        restart () {
+            // Simple hack to restart the game.
+            location.reload();
         },
         setStatus(status: GameStatuses) {
             this.status = status;
@@ -262,25 +272,32 @@ export const useGameStore = defineStore('game', {
             let message = '';
             if (this.turn === WhoseTurn.player) {
                 message = `Well-well, GPT rolled ${battle.diceResults.defender} and you rolled ${battle.diceResults.attacker}. You lost the battle for ${battle.forCountry}.`;
-
             } else {
                 message = `So, player rolled ${battle.diceResults.defender} and GPT rolled ${battle.diceResults.attacker}. GPT lost the battle for ${battle.forCountry}.`;
-
             }
+            // Moderator telling about the loss of the battle.
             await this.addMessage({
                 userName: WhoseTurn.moderator,
                 color: PlayerColors[WhoseTurn.moderator],
                 message,
             });
+            // Gpt commenting on the result of the battle.
             await this.addMessage({
                 userName: WhoseTurn.chatGPT,
                 color: PlayerColors[WhoseTurn.chatGPT],
                 message: gptComment,
             });
+
             await this.changeTurnBetweenPlayers();
             if (this.turn === WhoseTurn.chatGPT) {
                 await this.playerChatGpt.chooseNextCountry();
             }
+        },
+        setGameOver() {
+            if (this.turn === WhoseTurn.player) {
+                return this.setStatus(GameStatuses.gameWon);
+            }
+            return this.setStatus(GameStatuses.gameLost);
         }
     },
 })

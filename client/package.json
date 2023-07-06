@@ -17,6 +17,7 @@
     "@capacitor/status-bar": "5.0.2",
     "@ionic/vue": "^7.0.0",
     "@ionic/vue-router": "^7.0.0",
+    "canvas-confetti": "^1.6.0",
     "core-js": "^3.6.5",
     "ionicons": "^7.0.0",
     "pinia": "^2.1.3",
