@@ -3,6 +3,7 @@ import {usePlayerStore} from "@/store/player";
 import {usePlayerChatGPTStore} from "@/store/playerChatGPT";
 import {Country} from "@/types/country";
 import {PlayerColors, WhoseTurn} from "@/store/game";
+// @ts-ignore
 import DiceBox from "@3d-dice/dice-box";
 
 export enum BattleResult {
@@ -19,7 +20,7 @@ export interface Battle {
     },
 }
 
-let Box;
+let Box: undefined | DiceBox;
 
 export const useBattleStore = defineStore('battle', {
     state: () => ({
@@ -63,7 +64,7 @@ export const useBattleStore = defineStore('battle', {
         setReadyToRollDice(): void {
             this.readyToRollDice = true;
         },
-        async rollDice(): void {
+        async rollDice(): Promise<void> {
             if (!this.readyToRollDice) {
                 return;
             }
@@ -90,7 +91,7 @@ export const useBattleStore = defineStore('battle', {
                 }
             ]);
 
-            Box.onRollComplete = (results) => {''
+            Box.onRollComplete = (results: any) => {''
                 const attackerRolls = results[0].rolls;
                 const attackerResult =
                     attackerRolls[0].value > attackerRolls[1].value
@@ -109,6 +110,7 @@ export const useBattleStore = defineStore('battle', {
                     }
                 };
 
+                // @ts-ignore
                 this.resultPromise(battle);
 
                 this.initBattle(null, null, null, null);
@@ -117,6 +119,7 @@ export const useBattleStore = defineStore('battle', {
         },
         getDiceRollResult(): Promise<Battle> {
             return new Promise((resolve) => {
+                // @ts-ignore
                 this.resultPromise = resolve;
             });
         }

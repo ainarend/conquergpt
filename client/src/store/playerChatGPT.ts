@@ -4,6 +4,7 @@ import {useMapStore} from "@/store/map";
 import {GameStatuses, PlayerColors, useGameStore, WhoseTurn} from "@/store/game";
 import {usePlayerStore} from "@/store/player";
 import {BattleResult} from "@/store/battle";
+import {alertController} from "@ionic/vue";
 
 export const usePlayerChatGPTStore = defineStore('playerChatGPT', {
     state: () => ({
@@ -120,9 +121,22 @@ export const usePlayerChatGPTStore = defineStore('playerChatGPT', {
             this.countries = this.countries.filter(c => c.name !== countryName);
         },
         async getAnswerFromChatGPT(answerAbout: string) {
-            const response = await fetch(`http://localhost:3000/chatgpt/${answerAbout}`);
-            const json = await response.json();
-            return json;
+            try {
+                const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}chatgpt/${answerAbout}`);
+                const json = await response.json();
+                return json;
+            } catch (e) {
+                console.error(`Unable to reach (or our server) chatGPT: ${e}`);
+                const alert = await alertController.create({
+                    header: 'Alert',
+                    subHeader: 'Oh no',
+                    message: 'Game was unable to reach chatGPT. No idea what happens now tbh.',
+                    buttons: ['Let us see'],
+                });
+
+                await alert.present();
+                return {};
+            }
         },
     }
 })
