@@ -141,6 +141,7 @@ $header-height: 56px;
     z-index: 1000;
     height: 100%;
     width: 100%;
+    overflow: hidden;
     .chat {
       overflow-y: scroll;
       display: flex;

@@ -89,6 +89,9 @@ export const usePlayerChatGPTStore = defineStore('playerChatGPT', {
                 reasoning = comment;
 
                 playerStore.removeCountry(battle.forCountry);
+                if (playerStore.countries.length === 0) {
+                    return gameStore.setGameOver();
+                }
             }
 
             const country: Country = {

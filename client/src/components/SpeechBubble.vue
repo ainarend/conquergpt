@@ -52,6 +52,8 @@ export default {
     type() {
       const typewriter = document.getElementById(this.randomId);
       const text = this.message;
+      const longMessage = text.length > 75;
+      const speedFactor = longMessage ? 15 : 30
       if (!this.animate) {
         typewriter.innerHTML = text;
         this.gameStore.setMessageAnimated(this.index);
@@ -61,7 +63,7 @@ export default {
       if (this.textIndex < text.length) {
         typewriter.innerHTML = text.slice(0, this.textIndex) + '<span class="blinking-cursor">|</span>';
         this.textIndex++;
-        setTimeout(this.type, Math.random() * 50 + 50);
+        setTimeout(this.type, Math.random() * speedFactor + 50);
       } else {
         typewriter.innerHTML = text.slice(0, this.textIndex) + '<span class="blinking-cursor">|</span>';
         const cursor = typewriter.querySelector('.blinking-cursor');
