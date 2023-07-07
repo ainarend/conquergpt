@@ -271,9 +271,9 @@ export const useGameStore = defineStore('game', {
         async battleLost(battle: Battle, gptComment: string) {
             let message = '';
             if (this.turn === WhoseTurn.player) {
-                message = `Well-well, GPT rolled ${battle.diceResults.defender} and you rolled ${battle.diceResults.attacker}. You lost the battle for ${battle.forCountry}.`;
+                message = `Well-well, GPT's best roll was ${battle.diceResults.defender} and yours was ${battle.diceResults.attacker}. You lost the battle for ${battle.forCountry}.`;
             } else {
-                message = `So, player rolled ${battle.diceResults.defender} and GPT rolled ${battle.diceResults.attacker}. GPT lost the battle for ${battle.forCountry}.`;
+                message = `So, player's best roll was ${battle.diceResults.defender} and GPT's was ${battle.diceResults.attacker}. GPT lost the battle for ${battle.forCountry}.`;
             }
             // Moderator telling about the loss of the battle.
             await this.addMessage({

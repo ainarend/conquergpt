@@ -84,7 +84,7 @@ export const usePlayerChatGPTStore = defineStore('playerChatGPT', {
                 await gameStore.addMessage({
                     userName: WhoseTurn.moderator,
                     color: PlayerColors[WhoseTurn.moderator],
-                    message: `So, player rolled ${battle.diceResults.defender} and GPT rolled ${battle.diceResults.attacker}. GPT won the battle for ${battle.forCountry}.`,
+                    message: `So, player's best roll was ${battle.diceResults.defender} and GPT's was ${battle.diceResults.attacker}. GPT won the battle for ${battle.forCountry}.`,
                 });
                 // Show the victory comment instead of why to conquer the country.
                 reasoning = comment;

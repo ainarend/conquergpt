@@ -72,7 +72,7 @@ export const usePlayerStore = defineStore('player', {
                 await gameStore.addMessage({
                     userName: WhoseTurn.moderator,
                     color: PlayerColors[WhoseTurn.moderator],
-                    message: `So, player rolled ${battle.diceResults.attacker} and GPT rolled ${battle.diceResults.defender}. You won the battle for ${battle.forCountry}.`,
+                    message: `So, player highest roll was ${battle.diceResults.attacker} and GPT ${battle.diceResults.defender}. You won the battle for ${battle.forCountry}.`,
                 });
                 // Add GPT comment on the loss of the country.
                 await gameStore.addMessage({
