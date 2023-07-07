@@ -137,11 +137,12 @@ $header-height: 56px;
   .sidebar {
     display: grid;
     grid-template-rows: auto 40px;
-    background-color: #000;
+    background-color: var(--ion-background-color, #fff);
     z-index: 1000;
     height: 100%;
     width: 100%;
     overflow: hidden;
+    color: var(--ion-text-color, #000);
     .chat {
       overflow-y: scroll;
       display: flex;
@@ -157,9 +158,10 @@ $header-height: 56px;
       display: flex;
       align-items: center;
       padding: 0.5rem;
+      color: var(--ion-text-color, #000);
       a {
         margin-left: 0.25rem;
-        color: #fff;
+        color: var(--ion-text-color, #000);
       }
     }
   }
