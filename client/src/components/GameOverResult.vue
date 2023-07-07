@@ -19,6 +19,12 @@
           :index="gptMessage.index"
           :animate="gptMessage.animate"
       />
+      <template v-if="playerWon">
+        <p style="text-align: center">You managed to beat GPT in <strong>{{ turnNumber }}</strong> turns!<br /> Think you can do better?</p>
+      </template>
+      <template v-else>
+        <p style="text-align: center">GPT out maneuvered you in <strong>{{ turnNumber }}</strong> turns!<br /> Think you can do better?</p>
+      </template>
       <ion-button @click="playAgain">Play Again</ion-button>
     </div>
   </ion-modal>
@@ -33,6 +39,7 @@ import {
 import {PlayerColors, useGameStore, WhoseTurn} from "@/store/game";
 import SpeechBubble from "@/components/SpeechBubble.vue";
 import {usePlayerChatGPTStore} from "@/store/playerChatGPT";
+import {mapWritableState} from "pinia";
 
 const confettiLengthInSeconds = 3;
 export default {
@@ -72,6 +79,9 @@ export default {
     if (json) {
       this.gptMessage.message = json.message;
     }
+  },
+  computed: {
+    ...mapWritableState(useGameStore, ['turnNumber']),
   },
   methods: {
     showConfetti() {

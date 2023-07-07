@@ -16,12 +16,15 @@ export class ChatgptService {
         });
     }
 
-    async makeRequestToGPT(prompt: string): Promise<string> {
+    async makeRequestToGPT(prompt: string): Promise<string | Error> {
         try {
             const res = await this.api.sendMessage(prompt)
             this.logger.log(res.text)
             return res.text.replace('.', '');
         } catch (error) {
+            if (error.type === 'server_error') {
+                return new Error('Unable to connect to GPT server. Model overloaded');
+            }
             this.logger.error(`Request to GPT error: ${error}`);
         }
     }

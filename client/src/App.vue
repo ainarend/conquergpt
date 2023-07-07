@@ -35,6 +35,7 @@
               <ion-toggle style="margin-top: 0.5rem" :checked="animateText" @ionChange="toggleAnimation">
                 Show text animation
               </ion-toggle>
+              <p>Turn number: {{ turnNumber }}</p>
             </div>
           </div>
           <footer>
@@ -97,6 +98,8 @@ const chatIsShown = computed(() => {
 
 const gameStore = useGameStore();
 const battleStore = useBattleStore();
+
+const turnNumber = storeToRefs(gameStore).turnNumber;
 
 const showDiceRoll = storeToRefs(battleStore).isOnGoing;
 const isGameWon = storeToRefs(gameStore).isGameWon;
