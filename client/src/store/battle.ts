@@ -33,6 +33,7 @@ export const useBattleStore = defineStore('battle', {
         battlingForCountry: null as Country | null,
         attackingFromCountry: null as Country | null,
         resultPromise: null as Promise<Battle> | null,
+        lastConqueredCountryName: null as Country['name'] | null,
     }),
     actions: {
         async letsBattle(
@@ -79,6 +80,10 @@ export const useBattleStore = defineStore('battle', {
 
                 await Box.init();
             }
+            let defenderDiceQty = 1;
+            if (this.battlingForCountry.name === this.lastConqueredCountryName) {
+                defenderDiceQty = 2;
+            }
             Box.roll([
                 {
                     sides: 6,
@@ -87,7 +92,7 @@ export const useBattleStore = defineStore('battle', {
                 },{
                     sides: 6,
                     themeColor: PlayerColors[this.defender],
-                    qty: 1,
+                    qty: defenderDiceQty,
                 }
             ]);
 
@@ -99,11 +104,22 @@ export const useBattleStore = defineStore('battle', {
                         : attackerRolls[1].value;
 
                 const defenderRolls = results[1].rolls;
-                const defenderResult = defenderRolls[0].value;
+                const defenderResult =
+                    defenderRolls.length === 1
+                        ? defenderRolls[0].value
+                        : defenderRolls[0].value > defenderRolls[1].value
+                            ? attackerRolls[0].value
+                            : attackerRolls[1].value;
+
+                const battleIsWon = attackerResult > defenderResult;
+
+                if (battleIsWon) {
+                    this.setLastConqueredCountry(this.battlingForCountry.name);
+                }
 
                 const battle: Battle = {
                     forCountry: this.battlingForCountry.name,
-                    result: attackerResult > defenderResult ? BattleResult.won : BattleResult.lost,
+                    result: battleIsWon ? BattleResult.won : BattleResult.lost,
                     diceResults: {
                         attacker: attackerResult,
                         defender: defenderResult,
@@ -122,6 +138,9 @@ export const useBattleStore = defineStore('battle', {
                 // @ts-ignore
                 this.resultPromise = resolve;
             });
-        }
+        },
+        setLastConqueredCountry(countryName: string) {
+            this.lastConqueredCountryName = countryName;
+        },
     }
 })

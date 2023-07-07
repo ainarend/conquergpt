@@ -16,6 +16,7 @@
       <li>Attacked countries have to be neighbours</li>
       <li>In a battle for countries, dice rolls will determine the winner</li>
       <li>Attacker will have 2 dices, defender 1</li>
+      <li>If the country was just conquered from the opponent and if the opponent tries to reconquer it back, defender has 2 dices instead of 1</li>
       <li>If attacker has higher values, attacker wins & claims country</li>
       <li>If values are draw or lower, defender wins & keeps country</li>
       <li>Game is won by either player once all countries of opponent are conquered</li>
