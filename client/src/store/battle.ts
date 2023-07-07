@@ -96,7 +96,7 @@ export const useBattleStore = defineStore('battle', {
                 }
             ]);
 
-            Box.onRollComplete = (results: any) => {''
+            Box.onRollComplete = (results: any) => {
                 const attackerRolls = results[0].rolls;
                 const attackerResult =
                     attackerRolls[0].value > attackerRolls[1].value
@@ -126,11 +126,13 @@ export const useBattleStore = defineStore('battle', {
                     }
                 };
 
-                // @ts-ignore
-                this.resultPromise(battle);
+                setTimeout(() => {
+                    // @ts-ignore
+                    this.resultPromise(battle);
+                    this.initBattle(null, null, null, null);
+                    Box.clear();
+                }, 900);
 
-                this.initBattle(null, null, null, null);
-                Box.clear();
             }
         },
         getDiceRollResult(): Promise<Battle> {
