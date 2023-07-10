@@ -12,7 +12,7 @@
 
 The above was written by GPT. I'm not a student of the 3rd year of the Faculty of Applied Mathematics and Computer Science of the Belarusian State University. Luckily, or unfortunately.
 
-BUt I am interested in AI and in Mobile & Web apps.
+But I am interested in AI and in Mobile & Web apps.
 
 ## What is this project about?
 

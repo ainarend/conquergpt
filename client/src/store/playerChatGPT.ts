@@ -5,6 +5,7 @@ import {GameStatuses, PlayerColors, useGameStore, WhoseTurn} from "@/store/game"
 import {usePlayerStore} from "@/store/player";
 import {BattleResult} from "@/store/battle";
 import {alertController} from "@ionic/vue";
+import {findFirstNeighbour} from "@/country-neighbours";
 
 export const usePlayerChatGPTStore = defineStore('playerChatGPT', {
     state: () => ({
@@ -35,7 +36,7 @@ export const usePlayerChatGPTStore = defineStore('playerChatGPT', {
 
             await gameStore.startGame();
         },
-        async chooseNextCountry(): Promise<void> {
+        async chooseNextCountry(countryNameWhichWasCheating?: string): Promise<void> {
             const gameStore = useGameStore();
             const playerStore = usePlayerStore();
 
@@ -43,10 +44,14 @@ export const usePlayerChatGPTStore = defineStore('playerChatGPT', {
             const opponentCountries = playerStore.countries.map(country => country.name).join(',');
 
             const json = await this.getAnswerFromChatGPT(
-                `next-country?countries=${countries}&opponentCountries=${opponentCountries}`
+                `next-country?countries=${countries}&opponentCountries=${opponentCountries}&countryWhichWasCheating=${countryNameWhichWasCheating}`
             );
 
             const countryName = json.country;
+            if (await this.checkForCheating(countryName)) {
+                return await this.chooseNextCountry(countryName);
+            }
+
             let { reasoning } = json;
 
             if (gameStore.willNeedToBattleForCountry(countryName)) {
@@ -138,5 +143,52 @@ export const usePlayerChatGPTStore = defineStore('playerChatGPT', {
                 return {};
             }
         },
+        async checkForCheating(countryName: string) {
+            const gameStore = useGameStore();
+            if (
+                gameStore.allowGptToCheat !== true
+                && !findFirstNeighbour(countryName, this.countries.map(country => country.name))
+            ) {
+                const noCheatingMessage = `GPT tried to cheat by making a move on ${countryName} but it's not a neighbour of any of its countries.`;
+
+                if (gameStore.allowGptToCheat === false) {
+                    await gameStore.addMessage({
+                        userName: WhoseTurn.moderator,
+                        color: PlayerColors[WhoseTurn.moderator],
+                        message: noCheatingMessage,
+                    });
+                    // The player has already been asked if they want to allow GPT to cheat.
+                    return true;
+                }
+
+                const alert = await alertController.create({
+                    header: 'Alert',
+                    subHeader: `GPT tried to cheat, it tried to make a move on ${countryName} but it's not a neighbour of any of its countries.`,
+                    message: `How do you want GPT to behave in this game?`,
+                    buttons: [
+                        {text: 'Piss off GPT, no more cheating', role: 'cancel'},
+                        {text: 'Cheating is part of being able to think and gain an advantage', role: 'confirm'}
+                    ],
+                });
+
+                await alert.present();
+                const {role} = await alert.onDidDismiss();
+
+                if (role === 'cancel') {
+                    gameStore.setAllowGptToCheat(false);
+                    await gameStore.addMessage({
+                        userName: WhoseTurn.moderator,
+                        color: PlayerColors[WhoseTurn.moderator],
+                        message: noCheatingMessage,
+                    });
+
+                    // Allow GPT to try again.
+                    return true;
+                }
+                gameStore.setAllowGptToCheat(true);
+            }
+
+            return false;
+        }
     }
 })

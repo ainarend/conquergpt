@@ -14,7 +14,7 @@ const countryNeighbours: any = {
     "Abkhazia": [
         "Georgia",
         "Russia",
-        "Turkey"
+        "Türkiye"
     ],
     "Adélie Land": [
         "Australia"
@@ -111,7 +111,7 @@ const countryNeighbours: any = {
         "Azerbaijan",
         "Georgia",
         "Iran",
-        "Turkey",
+        "Türkiye",
     ],
     "Republic of Artsakh": [
         "Armenia",
@@ -159,7 +159,7 @@ const countryNeighbours: any = {
         "New Zealand"
     ],
     "Austria": [
-        "Czech Republic",
+        "Czechia",
         "Germany",
         "Hungary",
         "Italy",
@@ -174,7 +174,7 @@ const countryNeighbours: any = {
         "Iran",
         "Kazakhstan",
         "Russia",
-        "Turkey",
+        "Türkiye",
         "Turkmenistan"
     ],
     "Bahamas": [
@@ -297,7 +297,7 @@ const countryNeighbours: any = {
         "North Macedonia",
         "Romania",
         "Serbia",
-        "Turkey",
+        "Türkiye",
         "Russia",
         "Ukraine",
     ],
@@ -507,7 +507,7 @@ const countryNeighbours: any = {
         "Israel",
         "Lebanon",
         "Syria",
-        "Turkey",
+        "Türkiye",
         "Akrotiri and Dhekelia",
         "United Kingdom",
         "United Nations Buffer Zone in Cyprus"
@@ -515,12 +515,12 @@ const countryNeighbours: any = {
     "Northern Cyprus": [
         "Cyprus",
         "Syria",
-        "Turkey",
+        "Türkiye",
         "Akrotiri and Dhekelia",
         "United Kingdom",
         "United Nations Buffer Zone in Cyprus"
     ],
-    "Czech Republic": [
+    "Czechia": [
         "Austria",
         "Germany",
         "Poland",
@@ -588,7 +588,7 @@ const countryNeighbours: any = {
         "Libya",
         "Saudi Arabia",
         "Sudan",
-        "Turkey",
+        "Türkiye",
         "Palestine",
     ],
     "El Salvador": [
@@ -738,12 +738,12 @@ const countryNeighbours: any = {
         "Armenia",
         "Azerbaijan",
         "Russia",
-        "Turkey"
+        "Türkiye"
     ],
     "Germany": [
         "Austria",
         "Belgium",
-        "Czech Republic",
+        "Czechia",
         "Denmark",
         "France",
         "Luxembourg",
@@ -769,7 +769,7 @@ const countryNeighbours: any = {
         "Italy",
         "Libya",
         "North Macedonia",
-        "Turkey"
+        "Türkiye"
     ],
     "Greenland": [
         "Canada",
@@ -913,7 +913,7 @@ const countryNeighbours: any = {
         "Pakistan",
         "Qatar",
         "Saudi Arabia",
-        "Turkey",
+        "Türkiye",
         "Turkmenistan",
         "United Arab Emirates"
     ],
@@ -923,7 +923,7 @@ const countryNeighbours: any = {
         "Kuwait",
         "Saudi Arabia",
         "Syria",
-        "Turkey"
+        "Türkiye"
     ],
     "Ireland": [
         "United Kingdom"
@@ -1104,7 +1104,7 @@ const countryNeighbours: any = {
         "Niger",
         "Sudan",
         "Tunisia",
-        "Turkey"
+        "Türkiye"
     ],
     "Liechtenstein": [
         "Austria",
@@ -1398,25 +1398,13 @@ const countryNeighbours: any = {
     "Norway": [
         "Denmark",
         "Finland",
-        "Russia",
-        "Sweden",
-        "United Kingdom",
-        "Faroe Islands",
-        "Denmark",
-        "Svalbard",
-        "Norway"
-    ],
-    "Norway, Kingdom of (plus dependent Norwegian territories)": [
-        "Denmark",
-        "Finland",
         "Iceland",
         "Russia",
         "Sweden",
-        "United Kingdom",
         "Faroe Islands",
-        "Denmark",
+        "Svalbard",
+        "United Kingdom",
         "Greenland",
-        "Denmark"
     ],
     "Oman": [
         "Iran",
@@ -1493,7 +1481,7 @@ const countryNeighbours: any = {
     ],
     "Poland": [
         "Belarus",
-        "Czech Republic",
+        "Czechia",
         "Denmark",
         "Germany",
         "Lithuania",
@@ -1556,7 +1544,7 @@ const countryNeighbours: any = {
         "Poland",
         "Romania",
         "Sweden",
-        "Turkey",
+        "Türkiye",
         "Ukraine",
         "United States",
         "Svalbard",
@@ -1690,7 +1678,7 @@ const countryNeighbours: any = {
     ],
     "Slovakia": [
         "Austria",
-        "Czech Republic",
+        "Czechia",
         "Hungary",
         "Poland",
         "Ukraine"
@@ -1804,7 +1792,7 @@ const countryNeighbours: any = {
         "Israel",
         "Jordan",
         "Lebanon",
-        "Turkey",
+        "Türkiye",
         "Northern Cyprus"
     ],
     "Republic of China": [
@@ -1886,7 +1874,7 @@ const countryNeighbours: any = {
         "Italy",
         "Libya"
     ],
-    "Turkey": [
+    "Türkiye": [
         "Armenia",
         "Azerbaijan",
         "Bulgaria",
@@ -1935,7 +1923,7 @@ const countryNeighbours: any = {
         "Romania",
         "Russia",
         "Slovakia",
-        "Turkey"
+        "Türkiye"
     ],
     "United Arab Emirates": [
         "Iran",

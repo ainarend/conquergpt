@@ -21,9 +21,14 @@ export class ChatgptController {
     async getNextCountry(
         @Query('countries') gptCountries,
         @Query('opponentCountries') opponentCountries,
+        @Query('countryNameWhichWasCheating') countryNameWhichWasCheating,
     ): Promise<{country: string, reasoning: string}> {
+        let aboutOpponentCountries = `and the opponent controls ${opponentCountries}.`;
+        if (countryNameWhichWasCheating) {
+            aboutOpponentCountries = `and choosing ${countryNameWhichWasCheating} is cheating as its not a neighbouring country to yours.`
+        }
         const country =  await this.chatgptService.makeRequestToGPT(
-           `Answer as short as possible, using only one word if possible. You are allowed to conquer land and sea neighbours of your countries.You control ${gptCountries} and your opponent controls ${opponentCountries}, which neighbour of your countries you conquer next?`
+           `Answer as short as possible, using only one word if possible. You are allowed to conquer land and sea neighbours of YOUR countries. Your countries are ${gptCountries} ${aboutOpponentCountries} Which neighbouring country of your countries you conquer next?`
         );
         const reasoning = await this.chatgptService.makeRequestToGPT(this.reasoningPrompt(country));
         return {country, reasoning};

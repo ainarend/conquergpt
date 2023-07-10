@@ -35,6 +35,8 @@ watch(isOnGoingBattle, async (isOnGoingBattle) => {
 
     if (role === 'confirm') {
       battleStore.rollDice();
+    } else {
+      battleStore.playerChangedItsMindAndCanceledBattle();
     }
   }
 });

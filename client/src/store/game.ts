@@ -47,6 +47,8 @@ export const useGameStore = defineStore('game', {
         playerChatGpt: null as ReturnType<typeof usePlayerChatGPTStore> | null,
         messages: [] as GameMessage[],
         messageAnimationPromises: [] as any[],
+        autoConfirmBattle: false,
+        allowGptToCheat: null,
     }),
     getters: {
         isLoading(): boolean {
@@ -60,6 +62,9 @@ export const useGameStore = defineStore('game', {
         },
     },
     actions: {
+        setAllowGptToCheat(payload: boolean) {
+            this.allowGptToCheat = payload;
+        },
         async delay(ms: number) {
             // return new Promise(resolve => setTimeout(resolve, ms));
         },

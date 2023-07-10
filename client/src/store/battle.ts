@@ -95,6 +95,7 @@ export const useBattleStore = defineStore('battle', {
                     qty: defenderDiceQty,
                 }
             ]);
+            this.lastConqueredCountryName = null;
 
             Box.onRollComplete = (results: any) => {
                 const attackerRolls = results[0].rolls;
@@ -144,5 +145,8 @@ export const useBattleStore = defineStore('battle', {
         setLastConqueredCountry(countryName: string) {
             this.lastConqueredCountryName = countryName;
         },
+        playerChangedItsMindAndCanceledBattle() {
+            this.initBattle(null, null, null, null);
+        }
     }
 })

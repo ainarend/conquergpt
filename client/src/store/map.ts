@@ -29,18 +29,20 @@ export const useMapStore = defineStore('map', {
 
                 const data =  await geocoder.geocode({location: mapsMouseEvent.latLng});
 
-                const result = data.results && data.results[0];
-                if (result) {
-                    const addresses = result.address_components;
-                    const address = addresses.find((address: any) => address.types.includes('country'));
+                const hasData = data.results.length > 0;
+                if (hasData) {
+                    for (const result of data.results) {
+                        const addresses = result.address_components;
+                        const address = addresses.find((address: any) => address.types.includes('country'));
 
-                    const country = address?.long_name || false;
+                        const country = address?.long_name || false;
 
-                    if (!country) {
-                        return;
+                        if (!country) {
+                            continue;
+                        }
+
+                        return await gameStore.clickedOnCountry(country);
                     }
-
-                    await gameStore.clickedOnCountry(country);
                 }
             });
             this.map.addListener('zoom_changed', () => {

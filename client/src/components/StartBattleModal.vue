@@ -45,7 +45,7 @@ export default defineComponent({
   },
   methods: {
     cancel() {
-      if (this.isPlayerAttacking) {
+      if (!this.isPlayerAttacking) {
         return;
       }
       return modalController.dismiss(null, 'cancel');
